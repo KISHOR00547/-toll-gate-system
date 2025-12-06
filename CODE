@@ -1,0 +1,49 @@
+#include <Servo.h>
+
+Servo gateServo;
+
+const int trigPin = 9;
+const int echoPin = 8;
+const int servoPin = 3;
+
+long duration;
+int distance;
+
+// Gate angles
+int openAngle = 90;     // adjust if needed
+int closeAngle = 0;     // adjust if needed
+
+void setup() {
+  gateServo.attach(servoPin);
+  gateServo.write(closeAngle);
+
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  // Send ultrasonic trigger pulse
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.println(distance);
+
+  // If vehicle detected
+  if (distance < 20 && distance > 0) {  
+    gateServo.write(openAngle);  
+    delay(3000);                  // keep gate open for 3 seconds
+    gateServo.write(closeAngle);  
+  }
+
+  delay(200);
+}
